@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:sign_in_page_firebase/app/hata_exception.dart';
 import 'package:sign_in_page_firebase/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:sign_in_page_firebase/common_widget/social_log_in_button.dart';
-import 'package:sign_in_page_firebase/model/user.dart';
 import 'package:sign_in_page_firebase/viewmodel/user_model.dart';
 
 enum FormType { Register, LogIn }
@@ -17,7 +16,6 @@ class EmailveSifreLoginPage extends StatefulWidget {
 
 class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
   String _firstname, _lastname;
-  String _butonText, _linkText;
   var _formType = FormType.LogIn;
   final _formKey = GlobalKey<FormState>();
   final Firestore _firestore = Firestore.instance;
@@ -26,36 +24,23 @@ class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
 
   void _formSubmit() async {
     _formKey.currentState.save();
-    //debugPrint("email : " + _email + "şifre: " + _sifre);
-    final _userModel = Provider.of<UserModel>(context,
-        listen:
-            false); //burayı user modelimize erişmej için yapıyoruz //bunu yapma amacımız main de ağacmızın içine koyduğumuz nesneyi elde etmek
-
     if (_formType == FormType.LogIn) {
       try {
-        print("user oluştur");
+        print("create user");
         print("First Name: " + _firstname);
         print("Last Name: " + _lastname);
 
-        _addData(_firstname, _lastname);
-        /*
-        User _girisYapanUser =
-            await _userModel.signInWithEmailandPassword(_firstname, _lastname);
-        User _olusturulanUser = await _userModel.createUserWithFirstansLastName(
-            _firstname, _lastname);
-        if (_olusturulanUser != null)
-          print("Oturm açan user id: " + _olusturulanUser.firstname.toString());
-        */
+        //_addData(_firstname, _lastname);
 
       } on PlatformException catch (e) {
         PlatformDuyarliAlertDialog(
-          baslik: "Kullanıcı Oluşturma Hata",
+          baslik: "Error Creating User",
           icerik: Hatalar.goster(e.code),
-          anaButonYazisi: "Tamam",
+          anaButonYazisi: "Ok",
         ).goster(context);
       }
       var sonuc = _inputKontrol(_firstname, _lastname);
-      print("sonuc: " + sonuc.toString());
+      print("result: " + sonuc.toString());
       if (sonuc == false) {
         if (nameHataMesaji != null) {
           PlatformDuyarliAlertDialog(
@@ -71,12 +56,10 @@ class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
             anaButonYazisi: "Ok",
           ).goster(context);
         }
+      } else {
+        _addData(_firstname, _lastname);
+        print("User Created");
       }
-      /*PlatformDuyarliAlertDialog(
-        baslik: "Kullanıcı Oluşturma Hata",
-        icerik: "Hatalar.goster(e.code)",
-        anaButonYazisi: "Tamam",
-      ).goster(context);*/
     }
   }
 
@@ -123,26 +106,14 @@ class _EmailveSifreLoginPageState extends State<EmailveSifreLoginPage> {
         .then((value) => debugPrint("user added"));
   }
 
-  void _degistir() {
-    setState(() {
-      _formType =
-          _formType == FormType.LogIn ? FormType.Register : FormType.LogIn;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    //_butonText = _formType == FormType.LogIn ? "Giriş Yap " : "Kayıt Ol";
-    //_linkText = _formType == FormType.LogIn ? "Hesabınız Yok Mu? Kayıt Olun" : "Hesabınız Var Mı? Giriş Yapın";
-
     final _userModel = Provider.of<UserModel>(context);
-
     if (_userModel.user != null) {
       Future.delayed(Duration(milliseconds: 1), () {
         Navigator.of(context).popUntil(ModalRoute.withName("/"));
       });
     }
-
     return Scaffold(
         appBar: AppBar(
           title: Text("One Page Application"),

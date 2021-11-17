@@ -22,7 +22,6 @@ class UserRepository implements AuthBase {
   //AppMode appMode = AppMode.DEBUG;
   AppMode appMode = AppMode.RELEASE;
   List<User> tumKullaniciListesi = [];
-  List<User> tumMudavimlerimListesi = [];
   //List<Restoran> tumRestoranBilgilerimListesi = [];
   Map<String, String> kullaniciToken = Map<String, String>();
 
